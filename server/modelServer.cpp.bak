@@ -1,0 +1,56 @@
+#include "../client/model/GameManager.hpp"
+#include <iostream>
+#include <map>
+#include <vector>
+#include <string>
+
+class Server {
+    std::vector<std::string> onlineClients;
+    std::vector<std::string> registeredClient ;
+    std::vector<std::string> publicGames;
+    //faudrait faire en sorte de stocker le pseudo du createur de la game avec le mode et le nb max de joueurs
+    std::map<std::string, std::string> privateGames;
+public:
+    void registerClient(const std::string& clientName) {
+        for (const auto& clients : registeredClient) {
+            if (clients == clientName) {
+                std::cout << "[serveur] " << clientName << " est deja inscrit au serveur." << std::endl;
+                break;
+            }
+        }
+        registeredClient.push_back(clientName);
+        std::cout << "[serveur] " << clientName << " est inscrit au serveur." << std::endl;
+    }
+    void connectClient(const std::string& clientName) {
+        onlineClients.push_back(clientName);
+        std::cout << "[serveur] " << clientName << " est connecté au serveur." << std::endl;
+    }
+
+    void listPublicGames() {
+        if (publicGames.empty()) {
+            std::cout << "[serveur] Aucune partie publique disponible." << std::endl;
+        } else {
+            std::cout << "[serveur] Parties publiques disponibles :" << std::endl;
+            for (const auto& game : publicGames) {
+                std::cout << "- " << game << std::endl;
+            }
+        }
+    }
+
+    void joinPrivateGame(const std::string& code) {
+        if (privateGames.find(code) != privateGames.end()) {
+            std::cout << "[serveur] Code valide. Rejoindre la partie : " << privateGames[code] << std::endl;
+        } else {
+            std::cout << "[serveur] Code invalide. Veuillez réessayer." << std::endl;
+        }
+    }
+    void createGame(const std::string& gameName, bool isPrivate, const std::string& code = "") {
+        if (isPrivate && !code.empty()) {
+            privateGames[code] = gameName;
+            std::cout << "[serveur] Partie privée créée : " << gameName << " avec le code " << code << std::endl;
+        } else {
+            publicGames.push_back(gameName);
+            std::cout << "[serveur] Partie publique créée : " << gameName << std::endl;
+        }
+    }
+};
